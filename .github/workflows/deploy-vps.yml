@@ -43,9 +43,12 @@ jobs:
             git checkout main
             git pull --ff-only origin main
 
-            if [ -n "${GHCR_USER:-}" ] && [ -n "${GHCR_TOKEN:-}" ]; then
-              echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USER}" --password-stdin
+            if [ -z "${GHCR_USER:-}" ] || [ -z "${GHCR_TOKEN:-}" ]; then
+              echo "GHCR_USER/GHCR_TOKEN nao configurados nos secrets do GitHub."
+              exit 1
             fi
+
+            echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USER}" --password-stdin
 
             IMAGE="$IMAGE" docker compose -f docker-compose.vps.yml pull api
             IMAGE="$IMAGE" docker compose -f docker-compose.vps.yml up -d --remove-orphans
