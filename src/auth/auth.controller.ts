@@ -16,7 +16,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   @ApiOkResponse({ schema: { example: { ok: true } } })
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    const { token, expiresIn } = await this.authService.login(dto);
+    const { token, expiresIn, user } = await this.authService.login(dto);
 
     res.cookie('access_token', token, {
       httpOnly: true,
@@ -26,7 +26,7 @@ export class AuthController {
       path: '/',
     });
 
-    return { ok: true };
+    return { ok: true, user };
   }
 
   @Post('logout')

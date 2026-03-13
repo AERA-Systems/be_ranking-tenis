@@ -4,6 +4,7 @@ import { Challenge } from './database/entities/challenge.entity';
 import { Match } from './database/entities/match.entity';
 import { Player } from './database/entities/player.entity';
 import { RankHistory } from './database/entities/rank-history.entity';
+import { User } from './database/entities/user.entity';
 
 const useUrl = Boolean(process.env.DATABASE_URL);
 
@@ -18,7 +19,7 @@ export default new DataSource({
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
       }),
-  entities: [Player, Challenge, Match, RankHistory],
+  entities: [Player, Challenge, Match, RankHistory, User],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

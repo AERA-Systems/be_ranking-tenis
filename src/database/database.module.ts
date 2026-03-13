@@ -4,6 +4,7 @@ import { Challenge } from './entities/challenge.entity';
 import { Match } from './entities/match.entity';
 import { Player } from './entities/player.entity';
 import { RankHistory } from './entities/rank-history.entity';
+import { User } from './entities/user.entity';
 
 @Global()
 @Module({
@@ -19,7 +20,7 @@ import { RankHistory } from './entities/rank-history.entity';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
           }),
-      entities: [Player, Challenge, Match, RankHistory],
+      entities: [Player, Challenge, Match, RankHistory, User],
       synchronize: false,
       logging: false,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

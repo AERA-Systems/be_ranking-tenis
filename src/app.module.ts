@@ -10,9 +10,10 @@ import { HealthModule } from './health/health.module';
 import { MatchesModule } from './matches/matches.module';
 import { PlayersModule } from './players/players.module';
 import { RankingModule } from './ranking/ranking.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, HealthModule, PlayersModule, ChallengesModule, MatchesModule, RankingModule, DashboardModule],
+  imports: [DatabaseModule, AuthModule, HealthModule, PlayersModule, ChallengesModule, MatchesModule, RankingModule, DashboardModule, UsersModule],
   providers: [
     {
       provide: APP_GUARD,
