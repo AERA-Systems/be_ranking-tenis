@@ -7,3 +7,10 @@ services:
       - .env
     ports:
       - "${PORT:-3333}:3333"
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
+    name: savaris_backend
