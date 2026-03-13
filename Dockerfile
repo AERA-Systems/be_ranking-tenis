@@ -7,6 +7,7 @@ RUN apk add --no-cache openssl
 COPY package*.json ./
 RUN npm ci
 
+COPY nest-cli.json ./
 COPY tsconfig.json ./
 COPY src ./src
 
