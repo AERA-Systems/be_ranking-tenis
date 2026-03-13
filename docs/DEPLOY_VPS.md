@@ -5,9 +5,8 @@ Este guia descreve o fluxo completo para deploy automatico em VPS ao fazer `push
 ## Arquitetura do deploy
 
 1. `Docker Publish` roda no GitHub Actions quando ha push na `main`.
-2. A imagem e publicada no GHCR com tag `main`.
-3. `Deploy VPS` dispara apos `Docker Publish` com sucesso.
-4. O job conecta na VPS via SSH e executa:
+2. Job `publish`: imagem publicada no GHCR com tag `main`.
+3. Job `deploy` (encadeado com `needs: publish`): conecta na VPS via SSH e executa:
    - `git pull` no repositorio da VPS
    - `docker compose pull` da API
    - `docker compose up -d --remove-orphans`
@@ -15,7 +14,6 @@ Este guia descreve o fluxo completo para deploy automatico em VPS ao fazer `push
 ## Arquivos envolvidos
 
 - `.github/workflows/docker-publish.yml`
-- `.github/workflows/deploy-vps.yml`
 - `docker-compose.vps.yml`
 - `Dockerfile`
 - `scripts/deploy-vps.sh`
