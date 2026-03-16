@@ -8,9 +8,14 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const corsOrigins = process.env.CORS_ORIGIN?.split(',')
-    .map((item) => item.trim().replace(/\/$/, ''))
-    .filter(Boolean);
+  const defaultCorsOrigins = ['https://api-ranking.ribeirosistemas.com'];
+
+  const corsOrigins = [
+    ...defaultCorsOrigins,
+    ...(process.env.CORS_ORIGIN?.split(',')
+      .map((item) => item.trim().replace(/\/$/, ''))
+      .filter(Boolean) ?? []),
+  ];
 
   app.use(cookieParser());
   app.enableCors({
