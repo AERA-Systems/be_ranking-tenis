@@ -40,7 +40,7 @@ Exemplo de `.env` para este projeto:
 ```env
 NODE_ENV=production
 PORT=3333
-CORS_ORIGIN=http://62.171.173.97:4201
+CORS_ORIGIN=https://rankingfeminino.ribeirosistemas.com
 
 DB_HOST=62.171.173.97
 DB_PORT=5432
@@ -60,6 +60,7 @@ AUTH_TOKEN_EXPIRES_IN_SECONDS=43200
 Observacoes:
 - O projeto usa **TypeORM** com variaveis `DB_*`.
 - `DATABASE_URL` e opcional; se existir, ele tem prioridade.
+- `CORS_ORIGIN` aceita multiplas origens separadas por virgula.
 
 ## 3) Configurar rede Docker (se o banco estiver em container local)
 

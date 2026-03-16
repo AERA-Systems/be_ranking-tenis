@@ -8,18 +8,33 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const defaultCorsOrigins = ['https://api-ranking.ribeirosistemas.com'];
+  const defaultCorsOrigins = [
+    'https://api-ranking.ribeirosistemas.com',
+    'https://rankingfeminino.ribeirosistemas.com',
+  ];
 
-  const corsOrigins = [
+  const corsOrigins = Array.from(
+    new Set([
     ...defaultCorsOrigins,
     ...(process.env.CORS_ORIGIN?.split(',')
       .map((item) => item.trim().replace(/\/$/, ''))
       .filter(Boolean) ?? []),
-  ];
+    ]),
+  );
 
   app.use(cookieParser());
   app.enableCors({
-    origin: corsOrigins ?? true,
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin || corsOrigins.includes(origin.replace(/\/$/, ''))) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+    },
     credentials: true,
   });
 
