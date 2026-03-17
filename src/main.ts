@@ -13,6 +13,7 @@ async function bootstrap() {
     'https://rankingfeminino.ribeirosistemas.com',
     'http://localhost:4200'
   ];
+  const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
   const corsOrigins = Array.from(
     new Set([
@@ -29,7 +30,13 @@ async function bootstrap() {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
-      if (!origin || corsOrigins.includes(origin.replace(/\/$/, ''))) {
+      const normalizedOrigin = origin?.replace(/\/$/, '');
+
+      if (
+        !normalizedOrigin ||
+        corsOrigins.includes(normalizedOrigin) ||
+        localDevOriginPattern.test(normalizedOrigin)
+      ) {
         callback(null, true);
         return;
       }
