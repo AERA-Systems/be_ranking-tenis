@@ -92,14 +92,37 @@ Criar:
 - `GHCR_USER` (usuario GitHub com acesso de leitura ao pacote)
 - `GHCR_TOKEN` (token com escopo `read:packages`)
 
-## 6) Teste manual inicial na VPS
+## 6) Publicacao apenas via Nginx
+
+No arquivo `docker-compose.vps.yml`, a API fica somente com `expose: 3333`, sem `ports`.
+Isso significa:
+
+- o container responde na rede Docker `savaris_backend`
+- o Nginx acessa a API pelo nome do container/servico e porta interna `3333`
+- a porta `3333` nao fica publicada para fora da VPS
+
+Exemplo de `location` no Nginx:
+
+```nginx
+location / {
+    proxy_pass http://ranking-tenis-api:3333;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+O container do Nginx precisa estar na mesma rede Docker `savaris_backend`.
+
+## 7) Teste manual inicial na VPS
 
 ```bash
 cd /opt/ranking-tenis/be_ranking-tenis
 IMAGE=ghcr.io/<owner>/<repo>:main docker compose -f docker-compose.vps.yml up -d
 ```
 
-## 7) Deploy automatico por push
+## 8) Deploy automatico por push
 
 ```bash
 git add .
@@ -107,7 +130,7 @@ git commit -m "chore: ajustar deploy"
 git push origin main
 ```
 
-## 8) Validacao pos deploy
+## 9) Validacao pos deploy
 
 Na VPS:
 
@@ -117,25 +140,25 @@ export IMAGE=ghcr.io/<owner>/<repo>:main
 
 docker compose -f docker-compose.vps.yml ps
 docker compose -f docker-compose.vps.yml logs --tail=200 api
-curl -i http://localhost:3333/
+docker inspect ranking-tenis-api --format '{{json .NetworkSettings.Networks}}'
 ```
 
 Do seu computador:
 
 ```bash
-curl -i http://62.171.173.97:3333/
-curl -i http://62.171.173.97:3333/docs
+curl -i https://rankingfeminino.ribeirosistemas.com/
+curl -i https://rankingfeminino.ribeirosistemas.com/docs
 ```
 
-## 9) Teste de autenticacao (cookie)
+## 10) Teste de autenticacao (cookie)
 
 ```bash
-curl -i -c cookies.txt -X POST http://62.171.173.97:3333/auth/login \
+curl -i -c cookies.txt -X POST https://rankingfeminino.ribeirosistemas.com/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 
-curl -i -b cookies.txt http://62.171.173.97:3333/auth/me
-curl -i -b cookies.txt http://62.171.173.97:3333/players
+curl -i -b cookies.txt https://rankingfeminino.ribeirosistemas.com/auth/me
+curl -i -b cookies.txt https://rankingfeminino.ribeirosistemas.com/players
 ```
 
 ## Troubleshooting rapido
@@ -160,11 +183,18 @@ export IMAGE=ghcr.io/<owner>/<repo>:main
 docker compose -f docker-compose.vps.yml up -d --force-recreate
 ```
 
-### API nao responde externamente, mas responde em localhost
+### API nao responde pelo dominio
 
-Liberar porta no firewall da VPS (exemplo `ufw`):
+Verificar:
 
 ```bash
-ufw allow 3333/tcp
-ufw status
+docker network inspect savaris_backend
+docker compose -f docker-compose.vps.yml ps
+docker compose -f docker-compose.vps.yml logs --tail=200 api
 ```
+
+E confirmar que o Nginx:
+
+- esta na rede `savaris_backend`
+- faz `proxy_pass` para `http://ranking-tenis-api:3333`
+- tem DNS apontando para a VPS
