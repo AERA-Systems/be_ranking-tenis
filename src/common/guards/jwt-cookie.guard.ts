@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
+import { AUTH_COOKIE_NAME } from '../../auth/auth-cookie';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 @Injectable()
@@ -33,7 +34,7 @@ export class JwtCookieGuard implements CanActivate {
       return true;
     }
 
-    const cookieToken = req.cookies?.access_token as string | undefined;
+    const cookieToken = req.cookies?.[AUTH_COOKIE_NAME] as string | undefined;
     const bearer = req.headers.authorization?.startsWith('Bearer ')
       ? req.headers.authorization.slice(7)
       : undefined;

@@ -13,15 +13,13 @@ async function bootstrap() {
     'https://rankingfeminino.ribeirosistemas.com',
     'http://localhost:4200'
   ];
-  const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:\d+)?$/;
-  const privateNetworkOriginPattern = /^https?:\/\/(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$/;
 
   const corsOrigins = Array.from(
     new Set([
-    ...defaultCorsOrigins,
-    ...(process.env.CORS_ORIGIN?.split(',')
-      .map((item) => item.trim().replace(/\/$/, ''))
-      .filter(Boolean) ?? []),
+      ...defaultCorsOrigins,
+      ...(process.env.CORS_ORIGIN?.split(',')
+        .map((item) => item.trim().replace(/\/$/, ''))
+        .filter(Boolean) ?? []),
     ]),
   );
 
@@ -33,12 +31,7 @@ async function bootstrap() {
     ) => {
       const normalizedOrigin = origin?.replace(/\/$/, '');
 
-      if (
-        !normalizedOrigin ||
-        corsOrigins.includes(normalizedOrigin) ||
-        localDevOriginPattern.test(normalizedOrigin) ||
-        privateNetworkOriginPattern.test(normalizedOrigin)
-      ) {
+      if (!normalizedOrigin || corsOrigins.includes(normalizedOrigin)) {
         callback(null, true);
         return;
       }

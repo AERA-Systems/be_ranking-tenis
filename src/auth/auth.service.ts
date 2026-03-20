@@ -22,6 +22,7 @@ export class AuthService {
       {
         sub: user.id,
         username: user.username,
+        role: user.role,
       },
       {
         secret: process.env.JWT_SECRET ?? 'change-me',
@@ -29,6 +30,6 @@ export class AuthService {
       },
     );
 
-    return { token, expiresIn, user: { id: user.id, name: user.name, username: user.username } };
+    return { token, expiresIn, user: { id: user.id, name: user.name, username: user.username, role: user.role } };
   }
 }

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
+import { UserRole } from '../../database/enums';
 
 function parseBoolean(value: unknown) {
   if (value === undefined) {
@@ -39,6 +40,11 @@ export class CreateUserDto {
   @Transform(({ value }) => parseBoolean(value))
   @IsBoolean()
   active?: boolean;
+
+  @ApiPropertyOptional({ enum: UserRole, default: UserRole.ADMIN })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
 }
 
 export class UserIdParamDto {

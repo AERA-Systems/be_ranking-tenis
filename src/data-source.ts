@@ -3,6 +3,7 @@ import { join } from 'path';
 import { DataSource } from 'typeorm';
 import { Challenge } from './database/entities/challenge.entity';
 import { Match } from './database/entities/match.entity';
+import { MenuItemEntity } from './database/entities/menu-item.entity';
 import { Player } from './database/entities/player.entity';
 import { RankHistory } from './database/entities/rank-history.entity';
 import { User } from './database/entities/user.entity';
@@ -20,7 +21,7 @@ export default new DataSource({
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
       }),
-  entities: [Player, Challenge, Match, RankHistory, User],
+  entities: [Player, Challenge, Match, RankHistory, User, MenuItemEntity],
   migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
   synchronize: false,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
 import { Repository } from 'typeorm';
+import { UserRole } from '../database/enums';
 import { User } from '../database/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -39,6 +40,7 @@ export class UsersService {
       username: dto.username,
       passwordHash: this.hashPassword(dto.password),
       active: dto.active ?? true,
+      role: dto.role ?? UserRole.ADMIN,
     });
 
     const saved = await this.userRepo.save(created);
@@ -54,6 +56,7 @@ export class UsersService {
         username: true,
         passwordHash: true,
         active: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -70,6 +73,7 @@ export class UsersService {
     user.name = dto.name ?? user.name;
     user.username = dto.username ?? user.username;
     user.active = dto.active ?? user.active;
+    user.role = dto.role ?? user.role;
 
     if (dto.password) {
       user.passwordHash = this.hashPassword(dto.password);
@@ -98,6 +102,7 @@ export class UsersService {
         username: true,
         passwordHash: true,
         active: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },

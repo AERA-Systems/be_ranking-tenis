@@ -10,3 +10,8 @@ export enum MatchType {
   LEAGUE = 'LEAGUE',
   FRIENDLY = 'FRIENDLY',
 }
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  MASTER = 'MASTER',
+}

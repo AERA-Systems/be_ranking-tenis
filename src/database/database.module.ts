@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Challenge } from './entities/challenge.entity';
 import { Match } from './entities/match.entity';
+import { MenuItemEntity } from './entities/menu-item.entity';
 import { Player } from './entities/player.entity';
 import { RankHistory } from './entities/rank-history.entity';
 import { User } from './entities/user.entity';
@@ -20,7 +21,7 @@ import { User } from './entities/user.entity';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
           }),
-      entities: [Player, Challenge, Match, RankHistory, User],
+      entities: [Player, Challenge, Match, RankHistory, User, MenuItemEntity],
       synchronize: false,
       logging: false,
       ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

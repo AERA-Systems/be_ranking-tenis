@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../common/decorators/public.decorator';
+import { UserRole } from '../database/enums';
 import { CreateUserDto, UserIdParamDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -37,7 +38,7 @@ export class UsersController {
       throw new BadRequestException('Bootstrap inicial já foi realizado.');
     }
 
-    return this.usersService.create(dto);
+    return this.usersService.create({ ...dto, role: UserRole.MASTER });
   }
 
   @Patch(':id')

@@ -8,12 +8,13 @@ import { DatabaseModule } from './database/database.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
 import { MatchesModule } from './matches/matches.module';
+import { MenuModule } from './menu/menu.module';
 import { PlayersModule } from './players/players.module';
 import { RankingModule } from './ranking/ranking.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, HealthModule, PlayersModule, ChallengesModule, MatchesModule, RankingModule, DashboardModule, UsersModule],
+  imports: [DatabaseModule, AuthModule, HealthModule, PlayersModule, ChallengesModule, MatchesModule, RankingModule, DashboardModule, UsersModule, MenuModule],
   providers: [
     {
       provide: APP_GUARD,
