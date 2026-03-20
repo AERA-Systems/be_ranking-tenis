@@ -9,6 +9,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_REPOSITORY: ghcr.io/aera-systems/be_ranking-tenis
     permissions:
       contents: read
       packages: write
@@ -34,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ env.IMAGE_REPOSITORY }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
@@ -52,6 +54,8 @@ jobs:
     needs: publish
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    env:
+      IMAGE_REPOSITORY: ghcr.io/aera-systems/be_ranking-tenis
 
     steps:
       - name: Checkout repository at published commit
@@ -62,7 +66,7 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         env:
-          IMAGE: ghcr.io/${{ github.repository }}:main
+          IMAGE: ${{ env.IMAGE_REPOSITORY }}:main
           GHCR_USER: ${{ secrets.GHCR_USER }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:

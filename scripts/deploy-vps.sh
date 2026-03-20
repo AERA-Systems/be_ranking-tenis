@@ -4,6 +4,7 @@ set -eu
 APP_DIR="${APP_DIR:-/opt/ranking-tenis/be_ranking-tenis}"
 IMAGE="${IMAGE:?IMAGE is required}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.vps.yml}"
+IMAGE="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
 
 if [ ! -d "$APP_DIR/.git" ]; then
   echo "Erro: repositorio nao encontrado em $APP_DIR"
