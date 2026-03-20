@@ -2,75 +2,94 @@ import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm
 
 export class AddUserRoleAndCreateMenuItemsTable1760000002000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`CREATE TYPE "public"."User_role_enum" AS ENUM('ADMIN', 'MASTER')`);
-    await queryRunner.query(`ALTER TABLE "User" ADD "role" "public"."User_role_enum" NOT NULL DEFAULT 'ADMIN'`);
-    await queryRunner.query(`UPDATE "User" SET "role" = 'MASTER'`);
+    await queryRunner.query(`
+      DO $$
+      BEGIN
+        CREATE TYPE "public"."User_role_enum" AS ENUM('ADMIN', 'MASTER');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END
+      $$;
+    `);
 
-    await queryRunner.createTable(
-      new Table({
-        name: 'MenuItem',
-        columns: [
-          {
-            name: 'id',
-            type: 'uuid',
-            isPrimary: true,
-          },
-          {
-            name: 'label',
-            type: 'text',
-            isNullable: false,
-          },
-          {
-            name: 'icon',
-            type: 'text',
-            isNullable: false,
-          },
-          {
-            name: 'route',
-            type: 'text',
-            isNullable: true,
-          },
-          {
-            name: 'sortOrder',
-            type: 'int',
-            isNullable: false,
-            default: 0,
-          },
-          {
-            name: 'role',
-            type: '"public"."User_role_enum"',
-            isNullable: false,
-          },
-          {
-            name: 'parentId',
-            type: 'uuid',
-            isNullable: true,
-          },
-          {
-            name: 'createdAt',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'now()',
-          },
-          {
-            name: 'updatedAt',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'now()',
-          },
-        ],
-      }),
-    );
+    if (await queryRunner.hasTable('User')) {
+      const userTable = await queryRunner.getTable('User');
+      const hasRoleColumn = userTable?.findColumnByName('role');
 
-    await queryRunner.createForeignKey(
-      'MenuItem',
-      new TableForeignKey({
-        columnNames: ['parentId'],
-        referencedTableName: 'MenuItem',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-      }),
-    );
+      if (!hasRoleColumn) {
+        await queryRunner.query(`ALTER TABLE "User" ADD "role" "public"."User_role_enum" NOT NULL DEFAULT 'ADMIN'`);
+        await queryRunner.query(`UPDATE "User" SET "role" = 'MASTER' WHERE "role" = 'ADMIN' OR "role" IS NULL`);
+      }
+    }
+
+    const hasMenuItemTable = await queryRunner.hasTable('MenuItem');
+    if (!hasMenuItemTable) {
+      await queryRunner.createTable(
+        new Table({
+          name: 'MenuItem',
+          columns: [
+            {
+              name: 'id',
+              type: 'uuid',
+              isPrimary: true,
+            },
+            {
+              name: 'label',
+              type: 'text',
+              isNullable: false,
+            },
+            {
+              name: 'icon',
+              type: 'text',
+              isNullable: false,
+            },
+            {
+              name: 'route',
+              type: 'text',
+              isNullable: true,
+            },
+            {
+              name: 'sortOrder',
+              type: 'int',
+              isNullable: false,
+              default: 0,
+            },
+            {
+              name: 'role',
+              type: '"public"."User_role_enum"',
+              isNullable: false,
+            },
+            {
+              name: 'parentId',
+              type: 'uuid',
+              isNullable: true,
+            },
+            {
+              name: 'createdAt',
+              type: 'timestamp',
+              isNullable: false,
+              default: 'now()',
+            },
+            {
+              name: 'updatedAt',
+              type: 'timestamp',
+              isNullable: false,
+              default: 'now()',
+            },
+          ],
+        }),
+      );
+
+      await queryRunner.createForeignKey(
+        'MenuItem',
+        new TableForeignKey({
+          columnNames: ['parentId'],
+          referencedTableName: 'MenuItem',
+          referencedColumnNames: ['id'],
+          onDelete: 'CASCADE',
+        }),
+      );
+    }
 
     await queryRunner.query(`
       INSERT INTO "MenuItem" ("id", "label", "icon", "route", "sortOrder", "role", "parentId")
@@ -91,6 +110,7 @@ export class AddUserRoleAndCreateMenuItemsTable1760000002000 implements Migratio
         ('20000000-0000-0000-0000-000000000006', 'Listar Usuários', 'chevron_right', 'master/users/list', 0, 'MASTER', '20000000-0000-0000-0000-000000000005'),
         ('20000000-0000-0000-0000-000000000007', 'Novo Usuário', 'chevron_right', 'master/users/new', 1, 'MASTER', '20000000-0000-0000-0000-000000000005'),
         ('20000000-0000-0000-0000-000000000008', 'Relatórios', 'analytics', '/reports', 2, 'MASTER', NULL)
+      ON CONFLICT ("id") DO NOTHING
     `);
   }
 
