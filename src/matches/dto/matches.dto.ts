@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUUID, Matches, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUUID, IsDateString, Matches, Min } from 'class-validator';
 import { MatchType } from '../../database/enums';
 
 export class MatchesQueryDto {
@@ -61,8 +61,11 @@ export class CreateMatchDto {
   @IsBoolean()
   wo?: boolean;
 
-  @ApiPropertyOptional({ example: '2026-03-12T11:00:00.000Z' })
+  @ApiPropertyOptional({
+    example: '2026-03-12',
+    description: 'Data da partida. Aceita data simples (YYYY-MM-DD) ou data/hora em ISO-8601.',
+  })
   @IsOptional()
-  @IsString()
+  @IsDateString()
   playedAt?: string;
 }

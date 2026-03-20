@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Match } from './match.entity';
 import { Player } from './player.entity';
 
@@ -19,7 +19,7 @@ export class RankHistory {
   @Column({ name: 'rankAfter', type: 'int' })
   rankAfter!: number;
 
-  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
+  @Column({ name: 'createdAt', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 
   @ManyToOne(() => Match, (match) => match.rankHistory)

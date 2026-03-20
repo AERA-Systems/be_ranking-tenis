@@ -119,6 +119,8 @@ export class MatchesService {
         }),
       );
 
+      const rankHistoryCreatedAt = match.playedAt;
+
       let ladder: {
         type: 'RANKED_CHALLENGER_WIN' | 'TBD_CHALLENGER_WIN';
         rankBefore: { challenger: number | null; challenged: number };
@@ -180,6 +182,7 @@ export class MatchesService {
               playerId: item.id,
               rankBefore: beforeMap.get(item.id) ?? item.currentRank ?? 0,
               rankAfter: afterMap.get(item.id) ?? item.currentRank ?? 0,
+              createdAt: rankHistoryCreatedAt,
             })),
           );
 
@@ -233,6 +236,7 @@ export class MatchesService {
               playerId: item.id,
               rankBefore: beforeMap.get(item.id) ?? item.currentRank ?? 0,
               rankAfter: afterMap.get(item.id) ?? item.currentRank ?? 0,
+              createdAt: rankHistoryCreatedAt,
             })),
           );
 
@@ -241,6 +245,7 @@ export class MatchesService {
             playerId: dto.player1Id,
             rankBefore: 0,
             rankAfter: ra,
+            createdAt: rankHistoryCreatedAt,
           });
 
           ladder = {
@@ -256,12 +261,14 @@ export class MatchesService {
             playerId: dto.player1Id,
             rankBefore: p1.currentRank ?? 0,
             rankAfter: p1.currentRank ?? 0,
+            createdAt: rankHistoryCreatedAt,
           },
           {
             matchId: match.id,
             playerId: dto.player2Id,
             rankBefore: p2.currentRank ?? 0,
             rankAfter: p2.currentRank ?? 0,
+            createdAt: rankHistoryCreatedAt,
           },
         ]);
       }
