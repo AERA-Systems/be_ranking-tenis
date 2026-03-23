@@ -11,7 +11,9 @@ async function bootstrap() {
   const defaultCorsOrigins = [
     'https://api-ranking.ribeirosistemas.com',
     'https://rankingfeminino.ribeirosistemas.com',
-    'http://localhost:4200'
+    'http://localhost:4200',
+    'http://localhost:3333',
+    'http://127.0.0.1:3333',
   ];
 
   const corsOrigins = Array.from(
