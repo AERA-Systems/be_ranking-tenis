@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min, IsIn } from 'class-validator';
 
 export class CreatePlayerDto {
   @ApiProperty({ example: 'Maria' })
@@ -35,6 +35,13 @@ export class CreatePlayerDto {
   @IsInt()
   @Min(1)
   currentRank?: number | null;
+
+  // Novo campo para o status do jogador
+  @ApiPropertyOptional({ example: 'normal', enum: ['normal', 'vermelho'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['normal', 'vermelho'])
+  status?: string;  // Pode ser "normal" ou "vermelho"
 }
 
 export class PlayerIdParamDto {
