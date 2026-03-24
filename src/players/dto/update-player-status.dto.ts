@@ -9,5 +9,5 @@ export class UpdatePlayerStatusDto {
   })
   @IsString()                   // Valida que o campo é uma string
   @IsIn(['normal', 'vermelho']) // Valida que o valor é um dos dois
-  status: string;
+  status!: string;
 }
