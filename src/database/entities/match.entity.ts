@@ -39,6 +39,24 @@ export class Match {
   @Column({ type: 'int' })
   sets2!: number;
 
+  @Column({ name: 'set1Player1Games', type: 'int', nullable: true })
+  set1Player1Games!: number | null;
+
+  @Column({ name: 'set1Player2Games', type: 'int', nullable: true })
+  set1Player2Games!: number | null;
+
+  @Column({ name: 'set2Player1Games', type: 'int', nullable: true })
+  set2Player1Games!: number | null;
+
+  @Column({ name: 'set2Player2Games', type: 'int', nullable: true })
+  set2Player2Games!: number | null;
+
+  @Column({ name: 'set3Player1Games', type: 'int', nullable: true })
+  set3Player1Games!: number | null;
+
+  @Column({ name: 'set3Player2Games', type: 'int', nullable: true })
+  set3Player2Games!: number | null;
+
   @Column({ type: 'boolean', default: false })
   wo!: boolean;
 

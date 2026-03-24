@@ -119,8 +119,10 @@ test('create mantém ataques da desafiante e reseta a desafiada ao concluir part
     player1Id: challenger.id,
     player2Id: challenged.id,
     winnerId: challenged.id,
-    sets1: 0,
-    sets2: 2,
+    sets: [
+      { player1Games: 4, player2Games: 6 },
+      { player1Games: 3, player2Games: 6 },
+    ],
   });
 
   assert.deepEqual(challengeUpdates, [

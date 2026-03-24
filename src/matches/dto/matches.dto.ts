@@ -1,6 +1,21 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUUID, IsDateString, Matches, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { MatchType } from '../../database/enums';
 
 export class MatchesQueryDto {
@@ -39,21 +54,26 @@ export class CreateMatchDto {
   @IsUUID()
   player2Id!: string;
 
-  @ApiProperty({ minimum: 0 })
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(0)
-  sets1!: number;
-
-  @ApiProperty({ minimum: 0 })
-  @Transform(({ value }) => Number(value))
-  @IsInt()
-  @Min(0)
-  sets2!: number;
-
   @ApiProperty({ format: 'uuid' })
   @IsUUID()
   winnerId!: string;
+
+  @ApiProperty({
+    type: 'array',
+    minItems: 2,
+    maxItems: 3,
+    example: [
+      { player1Games: 6, player2Games: 4 },
+      { player1Games: 3, player2Games: 6 },
+      { player1Games: 6, player2Games: 2 },
+    ],
+  })
+  @IsArray()
+  @ArrayMinSize(2)
+  @ArrayMaxSize(3)
+  @ValidateNested({ each: true })
+  @Type(() => MatchSetDto)
+  sets!: MatchSetDto[];
 
   @ApiPropertyOptional({ default: false })
   @IsOptional()
@@ -68,4 +88,20 @@ export class CreateMatchDto {
   @IsOptional()
   @IsDateString()
   playedAt?: string;
+}
+
+export class MatchSetDto {
+  @ApiProperty({ minimum: 0, maximum: 7 })
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(0)
+  @Max(7)
+  player1Games!: number;
+
+  @ApiProperty({ minimum: 0, maximum: 7 })
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(0)
+  @Max(7)
+  player2Games!: number;
 }

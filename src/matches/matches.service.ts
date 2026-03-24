@@ -10,6 +10,89 @@ import { buildChallengedFlowUpdate } from '../challenges/challenge-flow';
 import { CreateMatchDto, MatchesQueryDto } from './dto/matches.dto';
 
 type RankedPlayer = { id: string; currentRank: number | null };
+type MatchSetScore = { player1Games: number; player2Games: number };
+type MatchSetSummary = {
+  sets1: number;
+  sets2: number;
+  detailedSetColumns: {
+    set1Player1Games: number | null;
+    set1Player2Games: number | null;
+    set2Player1Games: number | null;
+    set2Player2Games: number | null;
+    set3Player1Games: number | null;
+    set3Player2Games: number | null;
+  };
+};
+
+function isValidTennisSetScore(gamesA: number, gamesB: number) {
+  if (gamesA === gamesB) {
+    return false;
+  }
+
+  const winnerGames = Math.max(gamesA, gamesB);
+  const loserGames = Math.min(gamesA, gamesB);
+
+  if (winnerGames === 6) {
+    return loserGames <= 4;
+  }
+
+  if (winnerGames === 7) {
+    return loserGames === 5 || loserGames === 6;
+  }
+
+  return false;
+}
+
+function buildMatchSetSummary(
+  sets: MatchSetScore[],
+  winnerId: string,
+  player1Id: string,
+  player2Id: string,
+): MatchSetSummary {
+  let sets1 = 0;
+  let sets2 = 0;
+
+  for (const set of sets) {
+    if (!isValidTennisSetScore(set.player1Games, set.player2Games)) {
+      throw new BadRequestException('Placar inválido: cada set deve seguir a regra de tênis.');
+    }
+
+    if (set.player1Games > set.player2Games) {
+      sets1 += 1;
+    } else {
+      sets2 += 1;
+    }
+  }
+
+  if (sets1 !== 2 && sets2 !== 2) {
+    throw new BadRequestException('Placar inválido: a partida deve terminar quando uma atleta vencer 2 sets.');
+  }
+
+  if (sets.length === 3 && (sets1 === 3 || sets2 === 3)) {
+    throw new BadRequestException('Placar inválido: no máximo 2 sets vencidos em melhor de 3.');
+  }
+
+  if (winnerId === player1Id && sets1 !== 2) {
+    throw new BadRequestException('winnerId incompatível com o placar por set.');
+  }
+
+  if (winnerId === player2Id && sets2 !== 2) {
+    throw new BadRequestException('winnerId incompatível com o placar por set.');
+  }
+
+  return {
+    sets1,
+    sets2,
+    detailedSetColumns: {
+      set1Player1Games: sets[0]?.player1Games ?? null,
+      set1Player2Games: sets[0]?.player2Games ?? null,
+      set2Player1Games: sets[1]?.player1Games ?? null,
+      set2Player2Games: sets[1]?.player2Games ?? null,
+      set3Player1Games: sets[2]?.player1Games ?? null,
+      set3Player2Games: sets[2]?.player2Games ?? null,
+    },
+  };
+}
 
 @Injectable()
 export class MatchesService {
@@ -72,9 +155,7 @@ export class MatchesService {
       throw new BadRequestException('challengeId é obrigatório.');
     }
 
-    if (!wo && dto.sets1 === dto.sets2) {
-      throw new BadRequestException('Placar inválido: empate.');
-    }
+    const setSummary = buildMatchSetSummary(dto.sets, dto.winnerId, dto.player1Id, dto.player2Id);
 
     const result = await this.dataSource.transaction(async (manager) => {
       const playerRepo = manager.getRepository(Player);
@@ -115,8 +196,9 @@ export class MatchesService {
           challengeId: dto.challengeId ?? null,
           player1Id: dto.player1Id,
           player2Id: dto.player2Id,
-          sets1: dto.sets1,
-          sets2: dto.sets2,
+          sets1: setSummary.sets1,
+          sets2: setSummary.sets2,
+          ...setSummary.detailedSetColumns,
           winnerId: dto.winnerId,
           wo,
           playedAt,
