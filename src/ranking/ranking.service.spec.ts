@@ -17,4 +17,7 @@ test('monthly expõe attacks operacionais, defenses históricas e status do flux
   assert.match(executedSql, /COALESCE\(p\."consecutiveAttackCount", 0\)::int AS attacks/);
   assert.match(executedSql, /SELECT COUNT\(\*\) FROM "Challenge" c\s+WHERE c\."challengedId" = p\.id[\s\S]*?AS defenses/);
   assert.match(executedSql, /p\."challengeFlowStatus" AS "challengeFlowStatus"/);
+  assert.match(executedSql, /SELECT COUNT\(\*\) FROM "Match" m\s+WHERE m\."player1Id" = p\.id OR m\."player2Id" = p\.id[\s\S]*?AS "totalGames"/);
+  assert.match(executedSql, /SELECT COUNT\(\*\) FROM "Match" m\s+WHERE m\."winnerId" = p\.id[\s\S]*?AS wins/);
+  assert.doesNotMatch(executedSql, /LEFT JOIN "Match" mh/);
 });

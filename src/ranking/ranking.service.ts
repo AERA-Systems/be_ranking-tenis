@@ -56,9 +56,21 @@ export class RankingService {
         COALESCE(rsp."rankStartPrev", fim."rankStartFromMonth", p."currentRank")::int AS "rankStart",
         COALESCE(re."rankEnd", p."currentRank")::int AS "rankEnd",
         COALESCE(dm."delta", 0)::int AS "delta",
-        COUNT(mh.id)::int AS "totalGames",
-        COALESCE(SUM(CASE WHEN mh."winnerId" = p.id THEN 1 ELSE 0 END), 0)::int AS wins,
-        (COUNT(mh.id) - COALESCE(SUM(CASE WHEN mh."winnerId" = p.id THEN 1 ELSE 0 END), 0))::int AS losses,
+        COALESCE((
+          SELECT COUNT(*) FROM "Match" m
+          WHERE m."player1Id" = p.id OR m."player2Id" = p.id
+        ), 0)::int AS "totalGames",
+        COALESCE((
+          SELECT COUNT(*) FROM "Match" m
+          WHERE m."winnerId" = p.id
+        ), 0)::int AS wins,
+        (COALESCE((
+          SELECT COUNT(*) FROM "Match" m
+          WHERE m."player1Id" = p.id OR m."player2Id" = p.id
+        ), 0) - COALESCE((
+          SELECT COUNT(*) FROM "Match" m
+          WHERE m."winnerId" = p.id
+        ), 0))::int AS losses,
         COALESCE((
           SELECT COUNT(*) FROM "Challenge" c
           WHERE (c."challengerId" = p.id OR c."challengedId" = p.id)
@@ -78,10 +90,6 @@ export class RankingService {
       LEFT JOIN first_in_month fim ON fim."playerId" = p.id
       LEFT JOIN rank_end re ON re."playerId" = p.id
       LEFT JOIN delta_month dm ON dm."playerId" = p.id
-      LEFT JOIN "Match" mh
-        ON (mh."player1Id" = p.id OR mh."player2Id" = p.id)
-      AND mh."playedAt" >= $11
-      AND mh."playedAt" < $12
       WHERE p."participates" = true
       GROUP BY
         p.id, p.name, p.active,
@@ -90,8 +98,6 @@ export class RankingService {
       ORDER BY (p."currentRank" IS NULL) ASC, p."currentRank" ASC;
       `,
       [
-        start,
-        endExclusive,
         start,
         endExclusive,
         start,
