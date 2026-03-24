@@ -40,7 +40,7 @@ export class CreatePlayerDto {
   @ApiPropertyOptional({ example: 'normal', enum: ['normal', 'vermelho'] })
   @IsOptional()
   @IsString()
-  @IsIn(['normal', 'vermelho'])
+  @IsIn(['norma', 'vermelh'])
   status?: string;  // Pode ser "normal" ou "vermelho"
 }
 
