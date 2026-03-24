@@ -3,6 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreatePlayerDto, PlayerIdParamDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersService } from './players.service';
+import { UpdatePlayerStatusDto } from './dto/update-player-status.dto';  // Importe o novo DTO
 
 @ApiTags('Players')
 @Controller('players')
@@ -42,7 +43,10 @@ export class PlayersController {
   // Nova rota para atualizar o status do jogador
   @Patch(':id/status')
   @ApiOperation({ summary: 'Atualiza status do atleta (vermelho ou normal)' })
-  updateStatus(@Param() params: PlayerIdParamDto, @Body() dto: { status: string }) {
+  updateStatus(
+    @Param() params: PlayerIdParamDto, 
+    @Body() dto: UpdatePlayerStatusDto  // Use o novo DTO aqui
+  ) {
     return this.playersService.updateStatus(params.id, dto.status);
   }
 }

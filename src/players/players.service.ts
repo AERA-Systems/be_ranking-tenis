@@ -21,7 +21,7 @@ export class PlayersService {
   async getById(id: string) {
     const player = await this.playerRepo.findOne({ where: { id } });
     if (!player) {
-      throw new NotFoundException('Atleta não encontrada.');
+      throw new NotFoundException('Atleta não encontrado.');
     }
     return player;
   }
@@ -59,7 +59,7 @@ export class PlayersService {
   async update(id: string, dto: UpdatePlayerDto) {
     const player = await this.playerRepo.findOne({ where: { id } });
     if (!player) {
-      throw new NotFoundException('Atleta não encontrada.');
+      throw new NotFoundException('Atleta não encontrado.');
     }
 
     const payload: UpdatePlayerDto = { ...dto };
