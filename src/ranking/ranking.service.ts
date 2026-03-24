@@ -51,6 +51,7 @@ export class RankingService {
         p.id,
         p.name,
         p.active,
+        p.status,
         p."currentRank"::int AS "rank",
         COALESCE(rsp."rankStartPrev", fim."rankStartFromMonth", p."currentRank")::int AS "rankStart",
         COALESCE(re."rankEnd", p."currentRank")::int AS "rankEnd",
