@@ -65,18 +65,14 @@ export class RankingService {
             AND c."createdAt" >= $7
             AND c."createdAt" < $8
         ), 0)::int AS "totalChallenges",
-        COALESCE((
-          SELECT COUNT(*) FROM "Challenge" c
-          WHERE c."challengerId" = p.id
-            AND c."createdAt" >= $9
-            AND c."createdAt" < $10
-        ), 0)::int AS attacks,
+        COALESCE(p."consecutiveAttackCount", 0)::int AS attacks,
         COALESCE((
           SELECT COUNT(*) FROM "Challenge" c
           WHERE c."challengedId" = p.id
-            AND c."createdAt" >= $11
-            AND c."createdAt" < $12
-        ), 0)::int AS defenses
+            AND c."createdAt" >= $9
+            AND c."createdAt" < $10
+        ), 0)::int AS defenses,
+        p."challengeFlowStatus" AS "challengeFlowStatus"
       FROM "Player" p
       LEFT JOIN rank_start_prev rsp ON rsp."playerId" = p.id
       LEFT JOIN first_in_month fim ON fim."playerId" = p.id
@@ -84,8 +80,8 @@ export class RankingService {
       LEFT JOIN delta_month dm ON dm."playerId" = p.id
       LEFT JOIN "Match" mh
         ON (mh."player1Id" = p.id OR mh."player2Id" = p.id)
-      AND mh."playedAt" >= $13
-      AND mh."playedAt" < $14
+      AND mh."playedAt" >= $11
+      AND mh."playedAt" < $12
       WHERE p."participates" = true
       GROUP BY
         p.id, p.name, p.active,
@@ -94,8 +90,6 @@ export class RankingService {
       ORDER BY (p."currentRank" IS NULL) ASC, p."currentRank" ASC;
       `,
       [
-        start,
-        endExclusive,
         start,
         endExclusive,
         start,

@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
-export class AddChallengeFlowToPlayer1774361906 implements MigrationInterface {
+export class AddChallengeFlowToPlayer1774361906000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DO $$

@@ -70,6 +70,48 @@ test('create bloqueia 3o ataque quando challenger está em WAITING_DEFENSE', asy
   );
 });
 
+test('create bloqueia 3o ataque quando contador já está em 2 mesmo com status inconsistente', async () => {
+  const challenger = makePlayer('challenger', {
+    currentRank: 10,
+    consecutiveAttackCount: 2,
+    challengeFlowStatus: ChallengeFlowStatus.AVAILABLE_TO_ATTACK,
+  });
+  const challenged = makePlayer('challenged', { currentRank: 8 });
+
+  const playerRepo = {
+    findOne: async ({ where: { id } }: { where: { id: string } }) => (id === challenger.id ? challenger : challenged),
+    update: async () => ({ affected: 1 }),
+  };
+  const challengeRepo = {
+    findOne: async () => null,
+    create: (payload: Record<string, unknown>) => payload,
+    save: async (payload: Record<string, unknown>) => ({ id: 'challenge-1', ...payload }),
+  };
+  const dataSource = {
+    transaction: async (cb: (manager: { getRepository: (entity: unknown) => unknown }) => Promise<unknown>) =>
+      cb({
+        getRepository: (entity: unknown) => {
+          if ((entity as { name?: string }).name === 'Player') return playerRepo;
+          return challengeRepo;
+        },
+      }),
+  };
+  const findRepo = {
+    findOne: async () => ({ id: 'challenge-1', status: ChallengeStatus.PENDING, challenger, challenged }),
+  };
+
+  const service = new ChallengesService(
+    dataSource as never,
+    findRepo as never,
+    playerRepo as never,
+  );
+
+  await assert.rejects(
+    service.create({ challengerId: challenger.id, challengedId: challenged.id }),
+    BadRequestException,
+  );
+});
+
 test('create incrementa o challenger e reseta a challenged', async () => {
   const challenger = makePlayer('challenger', {
     currentRank: 10,

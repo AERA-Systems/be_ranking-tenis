@@ -3,7 +3,10 @@ import { ChallengeFlowStatus } from '../database/enums';
 import { Player } from '../database/entities/player.entity';
 
 export function ensurePlayerCanCreateAttack(player: Player) {
-  if (player.challengeFlowStatus === ChallengeFlowStatus.WAITING_DEFENSE) {
+  if (
+    player.challengeFlowStatus === ChallengeFlowStatus.WAITING_DEFENSE ||
+    (player.consecutiveAttackCount ?? 0) >= 2
+  ) {
     throw new BadRequestException('Atleta precisa ser desafiada antes de criar um novo challenge.');
   }
 }

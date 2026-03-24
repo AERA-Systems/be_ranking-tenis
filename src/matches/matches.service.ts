@@ -6,6 +6,7 @@ import { Challenge } from '../database/entities/challenge.entity';
 import { Match } from '../database/entities/match.entity';
 import { Player } from '../database/entities/player.entity';
 import { RankHistory } from '../database/entities/rank-history.entity';
+import { buildChallengedFlowUpdate } from '../challenges/challenge-flow';
 import { CreateMatchDto, MatchesQueryDto } from './dto/matches.dto';
 
 type RankedPlayer = { id: string; currentRank: number | null };
@@ -277,7 +278,10 @@ export class MatchesService {
       }
 
       if (dto.type === MatchType.CHALLENGE && dto.challengeId) {
-        await challengeRepo.update({ id: dto.challengeId }, { status: ChallengeStatus.COMPLETED });
+        await Promise.all([
+          challengeRepo.update({ id: dto.challengeId }, { status: ChallengeStatus.COMPLETED }),
+          playerRepo.update({ id: dto.player2Id }, buildChallengedFlowUpdate()),
+        ]);
       }
 
       return { matchId: match.id, ladder };
