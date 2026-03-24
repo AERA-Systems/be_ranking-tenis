@@ -29,9 +29,9 @@ export class Player {
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createdAt!: Date;
 
-  // Novo campo 'status' que pode ser "normal" ou "vermelho"
+  // Novo campo 'status' pode ser "normal" ou "vermelho"
   @Column({ type: 'varchar', length: 20, default: 'normal' })
-  status!: 'normal' | 'vermelho';  // Define os dois possíveis valores
+  status!: 'normal' | 'vermelho';
 
   @OneToMany(() => Challenge, (challenge) => challenge.challenger)
   challengerChallenges!: Challenge[];
