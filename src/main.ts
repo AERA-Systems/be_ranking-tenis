@@ -8,6 +8,10 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const localDevOriginPattern =
+    /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:\d+)?$/;
+  const privateNetworkOriginPattern =
+    /^https?:\/\/(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3})(:\d+)?$/;
   const defaultCorsOrigins = [
     'https://api-ranking.ribeirosistemas.com',
     'https://rankingfeminino.ribeirosistemas.com',
@@ -33,7 +37,12 @@ async function bootstrap() {
     ) => {
       const normalizedOrigin = origin?.replace(/\/$/, '');
 
-      if (!normalizedOrigin || corsOrigins.includes(normalizedOrigin)) {
+      if (
+        !normalizedOrigin ||
+        corsOrigins.includes(normalizedOrigin) ||
+        localDevOriginPattern.test(normalizedOrigin) ||
+        privateNetworkOriginPattern.test(normalizedOrigin)
+      ) {
         callback(null, true);
         return;
       }
