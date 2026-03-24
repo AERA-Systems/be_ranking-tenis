@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { ChallengeStatus } from '../database/enums';
 import { Challenge } from '../database/entities/challenge.entity';
 import { Player } from '../database/entities/player.entity';
 import { CreateChallengeDto } from './dto/challenges.dto';
+import { buildChallengedFlowUpdate, buildChallengerFlowUpdate, ensurePlayerCanCreateAttack } from './challenge-flow';
 
 @Injectable()
 export class ChallengesService {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(Challenge)
     private readonly challengeRepo: Repository<Challenge>,
     @InjectRepository(Player)
@@ -30,61 +32,76 @@ export class ChallengesService {
       throw new BadRequestException('Desafiante e desafiada não podem ser a mesma.');
     }
 
-    const [challenger, challenged] = await Promise.all([
-      this.playerRepo.findOne({ where: { id: challengerId } }),
-      this.playerRepo.findOne({ where: { id: challengedId } }),
-    ]);
-
-    if (!challenger || !challenged) {
-      throw new NotFoundException('Atleta não encontrada.');
-    }
-
-    if (!challenger.active || !challenged.active) {
-      throw new BadRequestException('Atleta inativa.');
-    }
-
-    if (!challenger.participates || !challenged.participates) {
-      throw new BadRequestException('Atleta não participa do ranking do ano.');
-    }
-
-    if (challenged.currentRank == null) {
-      throw new BadRequestException('A desafiada precisa ter ranking definido.');
-    }
-
-    const maxAbove = 6;
-    if (challenger.currentRank != null) {
-      if (challenger.currentRank <= challenged.currentRank) {
-        throw new BadRequestException('Desafio inválido: desafiada precisa estar acima.');
-      }
-
-      const diff = challenger.currentRank - challenged.currentRank;
-      if (diff > maxAbove) {
-        throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`);
-      }
-    }
-
-    const activeChallenge = await this.challengeRepo.findOne({
-      where: {
-        challengerId,
-        status: In([ChallengeStatus.PENDING, ChallengeStatus.ACCEPTED]),
-      },
-    });
-
-    if (activeChallenge) {
-      throw new BadRequestException('Essa atleta já tem um desafio ativo.');
-    }
-
     const days = dto.expiresInDays ?? 10;
     const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 
-    const created = this.challengeRepo.create({
-      challengerId,
-      challengedId,
-      expiresAt,
-      status: ChallengeStatus.PENDING,
+    const saved = await this.dataSource.transaction(async (manager) => {
+      const playerRepo = manager.getRepository(Player);
+      const challengeRepo = manager.getRepository(Challenge);
+
+      const [challenger, challenged] = await Promise.all([
+        playerRepo.findOne({ where: { id: challengerId } }),
+        playerRepo.findOne({ where: { id: challengedId } }),
+      ]);
+
+      if (!challenger || !challenged) {
+        throw new NotFoundException('Atleta não encontrada.');
+      }
+
+      if (!challenger.active || !challenged.active) {
+        throw new BadRequestException('Atleta inativa.');
+      }
+
+      if (!challenger.participates || !challenged.participates) {
+        throw new BadRequestException('Atleta não participa do ranking do ano.');
+      }
+
+      ensurePlayerCanCreateAttack(challenger);
+
+      if (challenged.currentRank == null) {
+        throw new BadRequestException('A desafiada precisa ter ranking definido.');
+      }
+
+      const maxAbove = 6;
+      if (challenger.currentRank != null) {
+        if (challenger.currentRank <= challenged.currentRank) {
+          throw new BadRequestException('Desafio inválido: desafiada precisa estar acima.');
+        }
+
+        const diff = challenger.currentRank - challenged.currentRank;
+        if (diff > maxAbove) {
+          throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`);
+        }
+      }
+
+      const activeChallenge = await challengeRepo.findOne({
+        where: {
+          challengerId,
+          status: In([ChallengeStatus.PENDING, ChallengeStatus.ACCEPTED]),
+        },
+      });
+
+      if (activeChallenge) {
+        throw new BadRequestException('Essa atleta já tem um desafio ativo.');
+      }
+
+      const created = challengeRepo.create({
+        challengerId,
+        challengedId,
+        expiresAt,
+        status: ChallengeStatus.PENDING,
+      });
+
+      const newChallenge = await challengeRepo.save(created);
+
+      await Promise.all([
+        playerRepo.update({ id: challenger.id }, buildChallengerFlowUpdate(challenger)),
+        playerRepo.update({ id: challenged.id }, buildChallengedFlowUpdate()),
+      ]);
+
+      return newChallenge;
     });
 
-    const saved = await this.challengeRepo.save(created);
     return this.challengeRepo.findOne({
       where: { id: saved.id },
       relations: { challenger: true, challenged: true },

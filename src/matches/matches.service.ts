@@ -103,6 +103,9 @@ export class MatchesService {
         if (challenge.challengerId !== dto.player1Id || challenge.challengedId !== dto.player2Id) {
           throw new BadRequestException('Desafio não corresponde às atletas (player1=desafiante, player2=desafiada).');
         }
+
+        // O fluxo de attack/defense é persistido na criação do challenge,
+        // evitando dupla contagem ao concluir a partida.
       }
 
       const match = await matchRepo.save(

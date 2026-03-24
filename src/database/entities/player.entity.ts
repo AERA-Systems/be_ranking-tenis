@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { ChallengeFlowStatus } from '../enums';
 import { Challenge } from './challenge.entity';
 import { Match } from './match.entity';
 import { RankHistory } from './rank-history.entity';
@@ -32,6 +33,18 @@ export class Player {
   // Novo campo 'status' pode ser "normal" ou "vermelho"
   @Column({ type: 'varchar', length: 20, default: 'normal' })
   status!: 'normal' | 'vermelho';
+
+  @Column({ name: 'consecutiveAttackCount', type: 'int', default: 0 })
+  consecutiveAttackCount!: number;
+
+  @Column({
+    name: 'challengeFlowStatus',
+    type: 'enum',
+    enum: ChallengeFlowStatus,
+    enumName: 'ChallengeFlowStatus',
+    default: ChallengeFlowStatus.AVAILABLE_TO_ATTACK,
+  })
+  challengeFlowStatus!: ChallengeFlowStatus;
 
   @OneToMany(() => Challenge, (challenge) => challenge.challenger)
   challengerChallenges!: Challenge[];

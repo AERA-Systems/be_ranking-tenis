@@ -30,11 +30,10 @@ export class DashboardService {
 
     const mostAttacks = await this.dataSource.query(`
       SELECT p.id as player_id, p.name,
-            COUNT(m.id)::int as attacks
+            COUNT(c.id)::int as attacks
       FROM "Player" p
-      JOIN "Match" m ON m."player1Id" = p.id
+      JOIN "Challenge" c ON c."challengerId" = p.id
       WHERE p."participates" = true AND p."currentRank" IS NOT NULL
-        AND m.type = 'CHALLENGE' AND m."winnerId" = m."player1Id"
       GROUP BY p.id, p.name
       ORDER BY attacks DESC
       LIMIT 10;
@@ -42,11 +41,10 @@ export class DashboardService {
 
     const mostDefenses = await this.dataSource.query(`
       SELECT p.id as player_id, p.name,
-            COUNT(m.id)::int as defenses
+            COUNT(c.id)::int as defenses
       FROM "Player" p
-      JOIN "Match" m ON m."player2Id" = p.id
+      JOIN "Challenge" c ON c."challengedId" = p.id
       WHERE p."participates" = true AND p."currentRank" IS NOT NULL
-        AND m.type = 'CHALLENGE' AND m."winnerId" = m."player2Id"
       GROUP BY p.id, p.name
       ORDER BY defenses DESC
       LIMIT 10;

@@ -5,6 +5,11 @@ export enum ChallengeStatus {
   CANCELED = 'CANCELED',
 }
 
+export enum ChallengeFlowStatus {
+  AVAILABLE_TO_ATTACK = 'AVAILABLE_TO_ATTACK',
+  WAITING_DEFENSE = 'WAITING_DEFENSE',
+}
+
 export enum MatchType {
   CHALLENGE = 'CHALLENGE',
   LEAGUE = 'LEAGUE',

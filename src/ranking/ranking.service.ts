@@ -66,20 +66,16 @@ export class RankingService {
             AND c."createdAt" < $8
         ), 0)::int AS "totalChallenges",
         COALESCE((
-          SELECT COUNT(*) FROM "Match" mm
-          WHERE mm.type = 'CHALLENGE'
-            AND mm."player1Id" = p.id
-            AND mm."winnerId" = p.id
-            AND mm."playedAt" >= $9
-            AND mm."playedAt" < $10
+          SELECT COUNT(*) FROM "Challenge" c
+          WHERE c."challengerId" = p.id
+            AND c."createdAt" >= $9
+            AND c."createdAt" < $10
         ), 0)::int AS attacks,
         COALESCE((
-          SELECT COUNT(*) FROM "Match" mm
-          WHERE mm.type = 'CHALLENGE'
-            AND mm."player2Id" = p.id
-            AND mm."winnerId" = p.id
-            AND mm."playedAt" >= $11
-            AND mm."playedAt" < $12
+          SELECT COUNT(*) FROM "Challenge" c
+          WHERE c."challengedId" = p.id
+            AND c."createdAt" >= $11
+            AND c."createdAt" < $12
         ), 0)::int AS defenses
       FROM "Player" p
       LEFT JOIN rank_start_prev rsp ON rsp."playerId" = p.id
