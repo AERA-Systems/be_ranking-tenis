@@ -102,7 +102,7 @@ export class PlayersService {
       throw new NotFoundException('Atleta não encontrado.');
     }
 
-    // Valida o status antes de atualizar
+    // Valida status antes de atualizar
     if (status !== 'normal' && status !== 'vermelho') {
       throw new BadRequestException('Status inválido. O status deve ser "normal" ou "vermelho".');
     }
