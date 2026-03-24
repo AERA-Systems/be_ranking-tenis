@@ -12,10 +12,12 @@ export class PlayersService {
     private readonly playerRepo: Repository<Player>,
   ) {}
 
+  // Listar todos os jogadores
   async list() {
     return this.playerRepo.find({ order: { createdAt: 'DESC' } });
   }
 
+  // Buscar jogador por ID
   async getById(id: string) {
     const player = await this.playerRepo.findOne({ where: { id } });
     if (!player) {
@@ -24,6 +26,7 @@ export class PlayersService {
     return player;
   }
 
+  // Criar novo jogador
   async create(dto: CreatePlayerDto) {
     const participates = dto.participates ?? true;
     const requestedRank = participates ? (dto.currentRank ?? null) : null;
@@ -52,6 +55,7 @@ export class PlayersService {
     return this.playerRepo.save(created);
   }
 
+  // Atualizar informações do jogador
   async update(id: string, dto: UpdatePlayerDto) {
     const player = await this.playerRepo.findOne({ where: { id } });
     if (!player) {
@@ -89,5 +93,21 @@ export class PlayersService {
     }
 
     return this.playerRepo.save(player);
+  }
+
+  // Atualizar o status do jogador (novo método)
+  async updateStatus(id: string, status: string): Promise<Player> {
+    const player = await this.playerRepo.findOne({ where: { id } });
+    if (!player) {
+      throw new NotFoundException('Atleta não encontrado.');
+    }
+
+    // Valida o status antes de atualizar
+    if (status !== 'normal' && status !== 'vermelho') {
+      throw new BadRequestException('Status inválido. O status deve ser "normal" ou "vermelho".');
+    }
+
+    player.status = status;  // Atualiza o status
+    return this.playerRepo.save(player);  // Salva no banco
   }
 }

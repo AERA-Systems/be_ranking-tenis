@@ -38,4 +38,11 @@ export class PlayersController {
   put(@Param() params: PlayerIdParamDto, @Body() dto: UpdatePlayerDto) {
     return this.playersService.update(params.id, dto);
   }
+
+  // Nova rota para atualizar o status do jogador
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Atualiza o status do atleta (vermelho ou normal)' })
+  updateStatus(@Param() params: PlayerIdParamDto, @Body() dto: { status: string }) {
+    return this.playersService.updateStatus(params.id, dto.status);
+  }
 }
