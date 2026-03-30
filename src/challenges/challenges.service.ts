@@ -73,7 +73,7 @@ export class ChallengesService {
     const challengedIndex = Ranking.findIndex(p => p.id === challengedId)
 
     if((challengerIndex - challengedIndex) > maxAbove) {
-      throw new BadRequestException('Desafio inválido: Desafiada não pode estar a mais que 6 posições')
+      throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`)
     }
 
     const activeChallenge = await this.challengeRepo.findOne({
