@@ -64,7 +64,8 @@ export class ChallengesService {
     const Ranking = await this.playerRepo.find({
       where: {
         participates: true,
-        active: true
+        active: true,
+        status: 'normal'
       },
       order: { currentRank: 'ASC' },
     })

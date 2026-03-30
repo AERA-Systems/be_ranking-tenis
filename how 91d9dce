@@ -1,0 +1,51 @@
+[33m1e8520f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/challenge[m[33m)[m Alterado retorno de erro
+[33m4384e63[m Adiciona correção nos desafios
+[33m03af0ba[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Deploy: Registro de SET
+[33m78cc8b9[m Deploy: fix contagem de jogos
+[33m48c38e8[m Deploy: fix rules
+[33m6210721[m Deploy: fix cors
+[33m65a4a0c[m Deploy: regra de dois ataques
+[33m3fe644c[m Deploy: returning status at ranking
+[33m72910c2[m Deploy: Fix migrations
+[33m19f6f52[m ajustes
+[33ma289ebc[m ajustestatus
+[33m4835ef4[m creatstatus
+[33m849318f[m Mudança forçada
+[33md881f85[m Mudança forçada
+[33m6b40a1d[m Forçando commit vazio
+[33m134108a[m Adiciona campo status ao jogador e ajusta lógica de atualização
+[33mfa4d8d6[m Vermelho
+[33m35c8060[m AjustesController
+[33m91d9dce[m Campo Be Status Vermelho
+[33mb150a79[m Deploy: Troca de base de banco de dados
+[33m4cd1b76[m Deploy: data do jogo
+[33m6a144c9[m Changes...
+[33me334e14[m Deploy fix docker files
+[33m5eafa5e[m Deploy Fix Cookies
+[33me288075[m[33m ([m[1;32mdev[m[33m)[m Deploy: fix docker compose
+[33mf6f61ed[m Deploy: nova tentativa de ajustar cors para local host
+[33mee7fff8[m Deploy: CORS Local Host
+[33m49103f6[m Deploy fix cors development
+[33m395c0c2[m Deploy: Fix Migrations
+[33m022f2a0[m Deploy: Fix CORS
+[33m422ac92[m Deploy: Cors new url api
+[33m2e6c989[m CI: Corrigindo Cors
+[33m5053fd3[m Deploy: Fix cors
+[33md56e735[m ci: unify publish and deploy jobs in single workflow
+[33med2cae3[m fix: run typeorm migrations on docker startup
+[33mb2279fb[m fix: make ghcr secrets optional in deploy workflow
+[33maebcd8d[m fix: require ghcr credentials in deploy workflow
+[33m40a01e4[m fix: ghcr login in vps deploy workflow
+[33m3fa5fa5[m Deploy: User Crud
+[33me16bc97[m docs: detalhar deploy nestjs docker github actions vps
+[33m126400b[m chore: sync lockfile for nest/typeorm deps
+[33mbbfaa4f[m chore: finalize nest/typeorm deploy setup
+[33mfb29ce5[m chore: finalize nest/typeorm deploy setup
+[33m434f1d3[m Ajustes scripts Nest JS
+[33m53a0a05[m prepare to deploy
+[33mfcd93dc[m Feature: Express to NestJS
+[33m089b3aa[m Deploy: ajustes docker compose
+[33mada13ee[m chore: configurar deploy vps docker
+[33m410c6bb[m Ajustes env
+[33m430f2ac[m First commit
+[33m0fc0218[m Initial commit
