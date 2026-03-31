@@ -15,7 +15,7 @@ export class ChallengesService {
     private readonly challengeRepo: Repository<Challenge>,
     @InjectRepository(Player)
     private readonly playerRepo: Repository<Player>,
-  ) {}
+  ) { }
 
   async list(status?: ChallengeStatus) {
     return this.challengeRepo.find({
@@ -30,6 +30,62 @@ export class ChallengesService {
 
     if (challengerId === challengedId) {
       throw new BadRequestException('Desafiante e desafiada não podem ser a mesma.');
+    }
+
+    const [challenger, challenged] = await Promise.all([
+      this.playerRepo.findOne({ where: { id: challengerId } }),
+      this.playerRepo.findOne({ where: { id: challengedId } }),
+    ]);
+
+    if (!challenger || !challenged) {
+      throw new NotFoundException('Atleta não encontrada.');
+    }
+
+    if (!challenger.active || !challenged.active) {
+      throw new BadRequestException('Atleta inativa.');
+    }
+
+    if (!challenger.participates || !challenged.participates) {
+      throw new BadRequestException('Atleta não participa do ranking do ano.');
+    }
+
+    if (challenged.currentRank == null) {
+      throw new BadRequestException('A desafiada precisa ter ranking definido.');
+    }
+
+    const maxAbove = 6;
+
+    if (challenger.currentRank != null) {
+      if (challenger.currentRank <= challenged.currentRank) {
+        throw new BadRequestException('Desafio inválido: desafiada precisa estar acima.');
+      }
+    }
+
+    const Ranking = await this.playerRepo.find({
+      where: {
+        participates: true,
+        active: true,
+        status: 'normal'
+      },
+      order: { currentRank: 'ASC' },
+    })
+
+    const challengerIndex = Ranking.findIndex(p => p.id === challengerId)
+    const challengedIndex = Ranking.findIndex(p => p.id === challengedId)
+
+    if((challengerIndex - challengedIndex) > maxAbove) {
+      throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`)
+    }
+
+    const activeChallenge = await this.challengeRepo.findOne({
+      where: {
+        challengerId,
+        status: In([ChallengeStatus.PENDING, ChallengeStatus.ACCEPTED]),
+      },
+    });
+
+    if (activeChallenge) {
+      throw new BadRequestException('Essa atleta já tem um desafio ativo.');
     }
 
     const days = dto.expiresInDays ?? 10;
