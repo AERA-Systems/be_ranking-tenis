@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, IsNull, Not, Repository } from 'typeorm';
 import { ChallengeStatus } from '../database/enums';
 import { Challenge } from '../database/entities/challenge.entity';
 import { Player } from '../database/entities/player.entity';
@@ -65,7 +65,8 @@ export class ChallengesService {
       where: {
         participates: true,
         active: true,
-        status: 'normal'
+        status: 'normal',
+        currentRank: Not(IsNull()),
       },
       order: { currentRank: 'ASC' },
     })
@@ -73,7 +74,7 @@ export class ChallengesService {
     const challengerIndex = Ranking.findIndex(p => p.id === challengerId)
     const challengedIndex = Ranking.findIndex(p => p.id === challengedId)
 
-    if((challengerIndex - challengedIndex) > maxAbove) {
+    if ((challengerIndex - challengedIndex) > maxAbove) {
       throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`)
     }
 
@@ -118,15 +119,9 @@ export class ChallengesService {
         throw new BadRequestException('A desafiada precisa ter ranking definido.');
       }
 
-      const maxAbove = 6;
       if (challenger.currentRank != null) {
         if (challenger.currentRank <= challenged.currentRank) {
           throw new BadRequestException('Desafio inválido: desafiada precisa estar acima.');
-        }
-
-        const diff = challenger.currentRank - challenged.currentRank;
-        if (diff > maxAbove) {
-          throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`);
         }
       }
 
