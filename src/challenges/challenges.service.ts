@@ -74,25 +74,6 @@ export class ChallengesService {
     const challengerIndex = Ranking.findIndex(p => p.id === challengerId)
     const challengedIndex = Ranking.findIndex(p => p.id === challengedId)
 
-    console.log('CHALLENGE →', {
-      challenger: {
-        name: challenger.name,
-        rank: challenger.currentRank
-      },
-      challenged: {
-        name: challenged.name,
-        rank: challenged.currentRank
-      }
-    });
-
-    console.log(
-      Ranking.map((p, i) => ({
-        pos: i,
-        name: p.name,
-        rank: p.currentRank
-      }))
-    );
-
     if ((challengerIndex - challengedIndex) > maxAbove) {
       throw new BadRequestException(`Só pode desafiar até ${maxAbove} posições acima.`)
     }
